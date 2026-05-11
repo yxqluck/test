@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">文件上传</h4>
+            </div>
+            <div class="card-body">
+                {% if error %}
+                <div class="alert alert-danger">{{ error }}</div>
+                {% endif %}
+                
+                <form method="POST" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label for="file" class="form-label">选择CSV或Excel文件 (最大10MB)</label>
+                        <input type="file" class="form-control" id="file" name="file" 
+                               accept=".csv,.xlsx,.xls" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">上传并开始分析</button>
+                </form>
+                
+                <hr>
+                
+                <h5>支持的功能</h5>
+                <ul>
+                    <li>CSV/Excel文件上传与预览</li>
+                    <li>缺失值处理（删除、均值/中位数/众数填充）</li>
+                    <li>异常值检测与移除（IQR方法）</li>
+                    <li>多种交互式图表（散点图、折线图、柱状图、直方图、箱线图、饼图）</li>
+                    <li>K-Means聚类分析</li>
+                    <li>线性回归分析</li>
+                    <li>处理后数据导出</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

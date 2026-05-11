@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header bg-primary text-white">
+        <h4 class="mb-0">数据分析</h4>
+    </div>
+    <div class="card-body">
+        <!-- 错误提示区域 -->
+        {% if error %}
+        <div class="alert alert-danger">{{ error }}</div>
+        {% endif %}
+        
+        <ul class="nav nav-tabs mb-4" id="analysisTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="kmeans-tab" data-bs-toggle="tab" 
+                        data-bs-target="#kmeans" type="button" role="tab">K-Means聚类</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="regression-tab" data-bs-toggle="tab" 
+                        data-bs-target="#regression" type="button" role="tab">线性回归</button>
+            </li>
+        </ul>
+        
+        <div class="tab-content" id="analysisTabsContent">
+            <!-- K-Means聚类 -->
+            <div class="tab-pane fade show active" id="kmeans" role="tabpanel">
+                <form method="POST" id="kmeans-form">
+                    <input type="hidden" name="analysis_type" value="kmeans">
+                    <div class="row align-items-end mb-3">
+                        <div class="col-md-4">
+                            <label class="form-label">选择特征列 (至少2个)</label>
+                            <div class="form-check">
+                                {% for col in numeric_columns %}
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" 
+                                           name="columns" value="{{ col }}" id="kmeans_{{ col }}">
+                                    <label class="form-check-label" for="kmeans_{{ col }}">
+                                        {{ col }}
+                                    </label>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">聚类数量</label>
+                            <input type="number" name="n_clusters" class="form-control" 
+                                   value="3" min="2" max="10">
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-primary w-100">执行聚类</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            
+            <!-- 线性回归 -->
+            <div class="tab-pane fade" id="regression" role="tabpanel">
+                <form method="POST" id="regression-form">
+                    <input type="hidden" name="analysis_type" value="linear_regression">
+                    <div class="row align-items-end mb-3">
+                        <div class="col-md-3">
+                            <label class="form-label">自变量 (X)</label>
+                            <select name="x_column" class="form-select" required>
+                                <option value="">请选择</option>
+                                {% for col in numeric_columns %}
+                                <option value="{{ col }}">{{ col }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">因变量 (Y)</label>
+                            <select name="y_column" class="form-select" required>
+                                <option value="">请选择</option>
+                                {% for col in numeric_columns %}
+                                <option value="{{ col }}">{{ col }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-primary w-100">执行回归</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        {% if result_html %}
+        <div class="mt-4 border-top pt-4">
+            {{ result_html|safe }}
+        </div>
+        {% endif %}
+        
+        <div class="mt-3">
+            <a href="{{ url_for('export_data') }}" class="btn btn-success">导出处理后的数据</a>
+        </div>
+    </div>
+</div>
+
+<script>
+// 表单提交后保持当前标签页激活
+document.addEventListener('DOMContentLoaded', function() {
+    // 检查URL哈希值，恢复标签页状态
+    const hash = window.location.hash;
+    if (hash) {
+        const tab = document.querySelector(`button[data-bs-target="${hash}"]`);
+        if (tab) {
+            tab.click();
+        }
+    }
+    
+    // 为所有表单添加提交事件监听器
+    document.getElementById('kmeans-form').addEventListener('submit', function() {
+        window.location.hash = '#kmeans';
+    });
+    
+    document.getElementById('regression-form').addEventListener('submit', function() {
+        window.location.hash = '#regression';
+    });
+});
+</script>
+{% endblock %}
